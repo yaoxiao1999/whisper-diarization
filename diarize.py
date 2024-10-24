@@ -44,7 +44,7 @@ parser.add_argument(
     action="store_false",
     dest="stemming",
     default=False,
-    help="Disables source separation."
+    help="Enables source separation."
     "This helps with long files that don't contain a lot of music.",
 )
 
