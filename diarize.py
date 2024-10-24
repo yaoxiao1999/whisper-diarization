@@ -253,5 +253,5 @@ for vocal_target in vocal_target_list:
     
     with open(f"{os.path.splitext(args.vocal_target)[0]}_realigned_wsm.json", 'w', encoding="utf-8-sig") as wsm_file:
         json.dump(wsm, wsm_file, indent=4)
-    
+    print("finished processing:", vocal_target)
     cleanup(temp_path)
