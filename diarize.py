@@ -37,7 +37,7 @@ mtypes = {"cpu": "int8", "cuda": "float16"}
 # Initialize parser
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "-a", "--audio_list", help="list of names of the target audio files", required=True
+    "-a", "--audio_folder", help="folder containing the target audio files", required=True
 )
 parser.add_argument(
     "--stem",
@@ -89,6 +89,7 @@ parser.add_argument(
 
 args = parser.parse_args()
 language = process_language_arg(args.language, args.model_name)
+audio_list = glob.glob(os.path.join(args.audio_folder, '*.wav'))
 
 if args.stemming:
     # Isolate vocals from the rest of the audio
@@ -112,7 +113,7 @@ if args.stemming:
             )
         vocal_target_list.append(vocal_target)
 else:
-    vocal_target_list = args.audio_list
+    vocal_target_list = audio_list
 
 
 # Transcribe the audio file
