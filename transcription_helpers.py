@@ -75,7 +75,7 @@ def transcribe_batched(
     for audio_file in audio_file_list:
         audio = whisperx.load_audio(audio_file)
         result = whisper_model.transcribe(audio, language=language, batch_size=batch_size)
-        result_dict[audio_file] = (result["segments"], result["language"], audio)
+        result_dict[audio_file] = [result["segments"], result["language"], audio]
     del whisper_model
     torch.cuda.empty_cache()
     return result_dict
