@@ -89,7 +89,7 @@ parser.add_argument(
 
 args = parser.parse_args()
 language = process_language_arg(args.language, args.model_name)
-audio_list = glob.glob(os.path.join(args.audio_folder, '*.wav'))
+audio_list = glob.glob(os.path.join(args.audio_folder, '**', '*.wav')) # search recursively
 
 if args.stemming:
     # Isolate vocals from the rest of the audio
@@ -117,7 +117,7 @@ else:
 
 
 # Transcribe the audio file
-# dict of {audio_file: (whisper_results, language, audio_waveform), ...}
+# dict of {audio_file: [whisper_results, language, audio_waveform], ...}
 transcribe_results_dict = transcribe_batched(
     vocal_target_list,
     language,
