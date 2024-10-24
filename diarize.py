@@ -143,6 +143,8 @@ for vocal_target in vocal_target_list:
         .to(alignment_model.dtype)
         .to(alignment_model.device)
     )
+    transcribe_results_dict[vocal_target][2] = audio_waveform
+    
     emissions, stride = generate_emissions(
         alignment_model, audio_waveform, batch_size=args.batch_size
     )
