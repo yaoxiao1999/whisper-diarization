@@ -177,11 +177,12 @@ for vocal_target in vocal_target_list:
     
     
     # convert audio to mono for NeMo combatibility
+    vocal_target_file_name = os.path.basename(vocal_target).split('.')[0]
     ROOT = os.getcwd()
     temp_path = os.path.join(ROOT, "temp_outputs")
     os.makedirs(temp_path, exist_ok=True)
     torchaudio.save(
-        os.path.join(temp_path, f"mono_file_{vocal_target}.wav"),
+        os.path.join(temp_path, f"mono_file_{vocal_target_file_name}.wav"),
         audio_waveform.cpu().unsqueeze(0).float(),
         16000,
         channels_first=True,
@@ -198,7 +199,7 @@ for vocal_target in vocal_target_list:
     # Reading timestamps <> Speaker Labels mapping
     
     speaker_ts = []
-    with open(os.path.join(temp_path, "pred_rttms", f"mono_file_{vocal_target}.rttm"), "r") as f:
+    with open(os.path.join(temp_path, "pred_rttms", f"mono_file_{vocal_target_file_name}.rttm"), "r") as f:
         lines = f.readlines()
         for line in lines:
             line_list = line.split(" ")
