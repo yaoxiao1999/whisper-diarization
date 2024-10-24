@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import re
+import json
 
 import torch
 import torchaudio
@@ -39,10 +40,10 @@ parser.add_argument(
     "-a", "--audio", help="name of the target audio file", required=True
 )
 parser.add_argument(
-    "--no-stem",
+    "--stem",
     action="store_false",
     dest="stemming",
-    default=True,
+    default=False,
     help="Disables source separation."
     "This helps with long files that don't contain a lot of music.",
 )
@@ -51,7 +52,7 @@ parser.add_argument(
     "--suppress_numerals",
     action="store_true",
     dest="suppress_numerals",
-    default=False,
+    default=True,
     help="Suppresses Numerical Digits."
     "This helps the diarization accuracy but converts all digits into written text.",
 )
@@ -59,7 +60,7 @@ parser.add_argument(
 parser.add_argument(
     "--whisper-model",
     dest="model_name",
-    default="medium.en",
+    default="large-v2",
     help="name of the Whisper model to use",
 )
 
@@ -74,7 +75,7 @@ parser.add_argument(
 parser.add_argument(
     "--language",
     type=str,
-    default=None,
+    default="en",
     choices=whisper_langs,
     help="Language spoken in the audio, specify None to perform language detection",
 )
@@ -98,7 +99,7 @@ if args.stemming:
 
     if return_code != 0:
         logging.warning(
-            "Source splitting failed, using original audio file. Use --no-stem argument to disable it."
+            "Source splitting failed, using original audio file. Set --stem argument to False to disable it."
         )
         vocal_target = args.audio
     else:
@@ -234,4 +235,10 @@ with open(f"{os.path.splitext(args.audio)[0]}.txt", "w", encoding="utf-8-sig") a
 with open(f"{os.path.splitext(args.audio)[0]}.srt", "w", encoding="utf-8-sig") as srt:
     write_srt(ssm, srt)
 
+with open(f"{os.path.splitext(args.audio)[0]}_word_timestamps.json", 'w', encoding="utf-8-sig") as word_timestamps_file:
+    json.dump(word_timestamps, word_timestamps_file, indent=4)
+
+with open(f"{os.path.splitext(args.audio)[0]}_realigned_wsm.json", 'w', encoding="utf-8-sig") as wsm_file:
+    json.dump(wsm, wsm_file, indent=4)
+    
 cleanup(temp_path)
