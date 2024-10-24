@@ -2,7 +2,7 @@ import torch
 
 
 def transcribe(
-    audio_file: str,
+    audio_file_list: list,
     language: str,
     model_name: str,
     compute_dtype: str,
@@ -31,26 +31,29 @@ def transcribe(
         word_timestamps = False
     else:
         word_timestamps = True
-
-    segments, info = whisper_model.transcribe(
-        audio_file,
-        language=language,
-        beam_size=5,
-        word_timestamps=word_timestamps,  # TODO: disable this if the language is supported by wav2vec2
-        suppress_tokens=numeral_symbol_tokens,
-        vad_filter=True,
-    )
-    whisper_results = []
-    for segment in segments:
-        whisper_results.append(segment._asdict())
+        
+    whisper_results_dict = {}
+    for audio_file in audio_file_list:
+        segments, info = whisper_model.transcribe(
+            audio_file,
+            language=language,
+            beam_size=5,
+            word_timestamps=word_timestamps,  # TODO: disable this if the language is supported by wav2vec2
+            suppress_tokens=numeral_symbol_tokens,
+            vad_filter=True,
+        )
+        whisper_results = []
+        for segment in segments:
+            whisper_results.append(segment._asdict())
+        whisper_results_dict[audio_file] = whisper_results
     # clear gpu vram
     del whisper_model
     torch.cuda.empty_cache()
-    return whisper_results, info.language
+    return whisper_results_dict, info.language
 
 
 def transcribe_batched(
-    audio_file: str,
+    audio_file_list: list,
     language: str,
     batch_size: int,
     model_name: str,
@@ -68,8 +71,11 @@ def transcribe_batched(
         language=language,
         asr_options={"suppress_numerals": suppress_numerals},
     )
-    audio = whisperx.load_audio(audio_file)
-    result = whisper_model.transcribe(audio, language=language, batch_size=batch_size)
+    result_dict = {}
+    for audio_file in audio_file_list:
+        audio = whisperx.load_audio(audio_file)
+        result = whisper_model.transcribe(audio, language=language, batch_size=batch_size)
+        result_dict[audio_file] = (result["segments"], result["language"], audio)
     del whisper_model
     torch.cuda.empty_cache()
-    return result["segments"], result["language"], audio
+    return result_dict
