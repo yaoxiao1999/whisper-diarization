@@ -65,6 +65,7 @@ def transcribe_batched(
         model_name,
         device,
         compute_type=compute_dtype,
+        language=language,
         asr_options={"suppress_numerals": suppress_numerals},
     )
     audio = whisperx.load_audio(audio_file)
